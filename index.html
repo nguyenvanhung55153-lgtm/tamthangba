@@ -6,10 +6,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1,viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#fde8f5" />
-    <title>8/3 AI – 11A5 💖 iOS Universal</title>
-    <meta name="description" content="Website chúc mừng 8/3 với AI nhận diện siêu tốc, tương thích iOS & Android." />
+    <title>8/3 AI – 11A5 💖 Super Vision</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -25,17 +23,12 @@
             padding: 0;
         }
 
-        html {
-            height: -webkit-fill-available;
-        }
-
         html,
         body {
             width: 100%;
             height: 100%;
             overflow: hidden;
             touch-action: manipulation;
-            -webkit-text-size-adjust: 100%;
         }
 
         body {
@@ -46,7 +39,6 @@
             justify-content: center;
             position: relative;
             min-height: 100svh;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         #bg {
@@ -59,18 +51,18 @@
         /* ═══ AI UI ═══ */
         #aiStatus {
             position: fixed;
-            top: 20px;
+            top: env(safe-area-inset-top, 20px);
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 10px 22px;
             border-radius: 40px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: #be185d;
-            box-shadow: 0 10px 40px rgba(190, 24, 93, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 30px rgba(190, 24, 93, 0.15);
+            border: 2px solid #fbcfe8;
             transition: all 0.3s;
             text-align: center;
             font-weight: 700;
@@ -78,12 +70,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            opacity: 1;
+            width: max-content;
         }
 
         .ai-pulse {
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
             background: #be185d;
             border-radius: 50%;
             animation: pulse 1s infinite;
@@ -101,14 +93,14 @@
             }
         }
 
-        /* CRITICAL: Positioning video off-screen but with size so iOS Safari processes it correctly */
+        /* Positioning video to be tiny but active for system processing */
         video#video {
             position: fixed;
-            top: -500px;
-            left: -500px;
-            width: 300px;
-            height: 300px;
-            opacity: 0.01;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            opacity: 0.1;
             pointer-events: none;
             z-index: -1;
         }
@@ -120,38 +112,35 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1.3rem;
+            gap: 1.5rem;
         }
 
         .env-label {
             font-family: 'Dancing Script', cursive;
-            font-size: clamp(1.2rem, 5vw, 2.2rem);
+            font-size: clamp(1.4rem, 6vw, 2.5rem);
             font-weight: 700;
             color: #db2777;
-            text-shadow: 0 2px 14px #fbcfe860;
             text-align: center;
-            max-width: 92vw;
-            line-height: 1.35;
+            max-width: 90vw;
+            line-height: 1.2;
         }
 
         .env-scene {
-            perspective: 1200px;
+            perspective: 1000px;
             cursor: pointer;
             animation: floatBob 5s ease-in-out infinite;
-            transition: filter .25s;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            transition: filter .2s;
         }
 
         .env-scene.opened {
             animation: none;
-            cursor: default;
+            pointer-events: none;
         }
 
         .env-box {
             position: relative;
-            width: min(540px, 90vw);
-            height: min(375px, 65vw);
+            width: min(540px, 86vw);
+            height: min(375px, 60vw);
         }
 
         .env-body {
@@ -159,7 +148,7 @@
             inset: 0;
             background: linear-gradient(160deg, #fff8fd 0%, #ffe8f7 55%, #ffd8f0 100%);
             border-radius: 20px;
-            box-shadow: 0 24px 70px rgba(244, 114, 182, .38), 0 6px 22px rgba(0, 0, 0, .08);
+            box-shadow: 0 20px 60px rgba(244, 114, 182, .3);
             overflow: hidden;
         }
 
@@ -169,29 +158,29 @@
             bottom: 0;
             left: 0;
             right: 0;
-            border-left: calc(min(540px, 90vw)/2) solid #f5abd8;
-            border-right: calc(min(540px, 90vw)/2) solid #f5abd8;
-            border-top: calc(min(375px, 65vw)*.44) solid transparent;
-        }
-
-        .env-left,
-        .env-right {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            border-style: solid;
+            border-left: calc(min(540px, 86vw)/2) solid #f5abd8;
+            border-right: calc(min(540px, 86vw)/2) solid #f5abd8;
+            border-top: calc(min(375px, 60vw)*.44) solid transparent;
         }
 
         .env-left {
+            position: absolute;
+            top: 0;
             left: 0;
-            border-width: calc(min(375px, 65vw)/2) 0 calc(min(375px, 65vw)/2) calc(min(540px, 90vw)*.35);
-            border-color: transparent transparent transparent #f9bde3;
+            height: 100%;
+            border-left: calc(min(540px, 86vw)*.35) solid #f9bde3;
+            border-top: calc(min(375px, 60vw)/2) solid transparent;
+            border-bottom: calc(min(375px, 60vw)/2) solid transparent;
         }
 
         .env-right {
+            position: absolute;
+            top: 0;
             right: 0;
-            border-width: calc(min(375px, 65vw)/2) calc(min(540px, 90vw)*.35) calc(min(375px, 65vw)/2) 0;
-            border-color: transparent #f9bde3 transparent transparent;
+            height: 100%;
+            border-right: calc(min(540px, 86vw)*.35) solid #f9bde3;
+            border-top: calc(min(375px, 60vw)/2) solid transparent;
+            border-bottom: calc(min(375px, 60vw)/2) solid transparent;
         }
 
         .env-flap {
@@ -200,13 +189,14 @@
             left: 0;
             width: 100%;
             transform-origin: top center;
-            transition: transform .72s cubic-bezier(.4, 0, .2, 1);
+            transition: transform .8s cubic-bezier(.4, 0, .2, 1);
             z-index: 6;
         }
 
         .env-flap svg {
             display: block;
             width: 100%;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
         }
 
         .env-scene.opened .env-flap {
@@ -215,53 +205,63 @@
 
         .seal {
             position: absolute;
-            top: 50%;
+            top: 52%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-size: 3.5rem;
             z-index: 7;
-            animation: sealBeat 1.8s infinite;
-            transition: all .4s;
+            animation: sealBeat 2s infinite;
         }
 
         .env-scene.opened .seal {
             opacity: 0;
             transform: translate(-50%, -50%) scale(0);
+            transition: 0.4s;
         }
 
         .env-letter {
             position: absolute;
-            bottom: 9%;
+            bottom: 10%;
             left: 50%;
-            width: 74%;
+            width: 75%;
             transform: translateX(-50%);
             z-index: 4;
-            transition: transform .65s .1s cubic-bezier(.22, 1, .36, 1);
+            transition: transform .7s .1s cubic-bezier(.2, 1, .3, 1);
         }
 
         .env-letter-inner {
-            background: linear-gradient(155deg, #fffcfe, #fff0fb);
-            border-radius: 11px;
-            height: calc(min(375px, 65vw)*.31);
-            border: 2px solid rgba(249, 168, 212, .7);
+            background: #fff;
+            border-radius: 10px;
+            height: calc(min(375px, 60vw)*.35);
+            border: 2px solid #f9a8d4;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(1rem, 3.6vw, 1.5rem);
+            font-size: 1.2rem;
             color: #ec4899;
-            font-weight: 700;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
         .env-scene.opened .env-letter {
-            transform: translateX(-50%) translateY(-70%);
+            transform: translateX(-50%) translateY(-65%);
         }
 
         .tap-hint {
-            font-size: clamp(.82rem, 3vw, 1.05rem);
+            font-size: 0.9rem;
             color: #be185d;
-            font-weight: 600;
+            font-weight: 700;
             text-align: center;
-            animation: hintPop 2.3s infinite;
+            animation: pulseFade 2s infinite;
+        }
+
+        #debugHint {
+            position: fixed;
+            bottom: 20px;
+            font-size: 0.7rem;
+            color: #9d174d;
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         /* ═══ WISH OVERLAY ═══ */
@@ -272,7 +272,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
             pointer-events: none;
             opacity: 0;
             transition: opacity .4s;
@@ -286,66 +286,64 @@
         .wish-backdrop {
             position: absolute;
             inset: 0;
-            background: rgba(253, 232, 245, 0.85);
-            backdrop-filter: blur(20px);
+            background: rgba(253, 232, 245, 0.9);
+            backdrop-filter: blur(15px);
         }
 
         .wish-card {
             position: relative;
             z-index: 2;
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
             background: white;
-            border-radius: 30px;
-            padding: 40px 30px;
-            border: 2px solid #f9a8d4;
+            border-radius: 35px;
+            padding: 45px 30px;
+            border: 3px solid #f9a8d4;
             text-align: center;
-            transform: translateY(50px) scale(0.9);
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: scale(0.85) translateY(40px);
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 80px rgba(190, 24, 93, 0.2);
         }
 
         .wish-overlay.show .wish-card {
-            transform: translateY(0) scale(1);
+            transform: scale(1) translateY(0);
         }
 
         .date-badge {
             font-family: 'Dancing Script', cursive;
-            font-size: 3.5rem;
+            font-size: 3.8rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #f472b6, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            color: #db2777;
+            margin-bottom: 5px;
             display: block;
         }
 
         .wish-body {
-            font-size: 1.3rem;
-            color: #5b21b6;
-            line-height: 1.8;
-            font-weight: 600;
-            margin: 15px 0;
+            font-size: 1.35rem;
+            color: #4c1d95;
+            line-height: 1.7;
+            font-weight: 700;
+            margin: 20px 0;
         }
 
         .wish-sig {
             font-family: 'Dancing Script', cursive;
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             color: #be185d;
             font-weight: 700;
-            margin-top: 10px;
         }
 
         .btn-close {
-            margin-top: 25px;
-            background: linear-gradient(135deg, #f9a8d4, #e879c0);
+            margin-top: 30px;
+            background: linear-gradient(135deg, #f9a8d4 0%, #db2777 100%);
             color: white;
             border: none;
-            padding: 12px 35px;
+            padding: 14px 40px;
             border-radius: 50px;
-            font-weight: 700;
+            font-weight: 800;
             font-family: 'Baloo 2', cursive;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(232, 121, 192, 0.4);
+            font-size: 1.1rem;
         }
 
         @keyframes floatBob {
@@ -356,7 +354,7 @@
             }
 
             50% {
-                transform: translateY(-20px);
+                transform: translateY(-15px);
             }
         }
 
@@ -368,15 +366,15 @@
             }
 
             50% {
-                transform: translate(-50%, -50%) scale(1.2);
+                transform: translate(-50%, -50%) scale(1.15);
             }
         }
 
-        @keyframes hintPop {
+        @keyframes pulseFade {
 
             0%,
             100% {
-                opacity: 0.5;
+                opacity: 0.6;
             }
 
             50% {
@@ -388,18 +386,14 @@
 
 <body>
     <canvas id="bg"></canvas>
-    <!-- video playsinline muted for iOS autoplay compatibility -->
-    <video id="video" autoplay muted playsinline loop></video>
+    <video id="video" autoplay muted playsinline></video>
     <div id="aiStatus">
-        <div class="ai-pulse"></div><span>Đã sẵn sàng. Chờ quét mặt...</span>
+        <div class="ai-pulse"></div><span>Đang khởi động AI...</span>
     </div>
+    <div id="debugHint">Cần đủ ánh sáng và nhìn thẳng vào cam nhé!</div>
 
     <div id="envWrap">
-        <p class="env-label">🌸 Lớp 11A5 · Chúc Mừng 8/3 🌸</p>
-        <p id="iosHint"
-            style="font-size: 0.75rem; color: #7c3aed; margin-top: -10px; margin-bottom: 10px; display: none;">(iOS: Hãy
-            chạm nhẹ vào màn hình 1 lần để kích hoạt camera nhé!)</p>
-
+        <p class="env-label">🌸 11A5 Chúc Mừng 8/3 🌸</p>
         <div class="env-scene" id="envScene">
             <div class="env-box">
                 <div class="env-body">
@@ -410,7 +404,7 @@
                             <defs>
                                 <linearGradient id="fG" x1="0" y1="0" x2="1" y2="1">
                                     <stop offset="0%" stop-color="#fba8d8" />
-                                    <stop offset="100%" stop-color="#9333ea" />
+                                    <stop offset="100%" stop-color="#db2777" />
                                 </linearGradient>
                             </defs>
                             <polygon points="0,0 540,0 270,198" fill="url(#fG)" />
@@ -418,12 +412,12 @@
                     </div>
                     <div class="seal">💝</div>
                     <div class="env-letter">
-                        <div class="env-letter-inner">🌸 8 / 3 / 2026 🌸</div>
+                        <div class="env-letter-inner">🌷 8 / 3 / 2026 🌷</div>
                     </div>
                 </div>
             </div>
         </div>
-        <p class="tap-hint"><span class="bounce">💌</span> Thư sẽ tự mở khi thấy mặt bạn!</p>
+        <p class="tap-hint">💌 Nhìn vào camera để mở thư</p>
     </div>
 
     <div class="wish-overlay" id="wishOverlay">
@@ -431,13 +425,12 @@
         <div class="wish-card">
             <span class="date-badge">8 · 3</span>
             <p class="wish-body" id="wishBodyEl"></p>
-            <div style="width:60px;height:3px;background:#f9a8d4;margin:15px auto;border-radius:10px;"></div>
-            <p class="wish-sig">— Từ tập thể nam 11A5 với yêu thương 💕 —</p>
-            <button class="btn-close" id="btnClose">💖 Đóng thư lại</button>
+            <div style="width:50px;height:2px;background:#f9a8d4;margin:15px auto;border-radius:10px;"></div>
+            <p class="wish-sig">— Từ tập thể nam 11A5 gửi bạn 💕 —</p>
+            <button class="btn-close" id="btnClose">Đóng thư lại</button>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script>
         const WISHES = [
@@ -495,17 +488,18 @@
 
         const LS_KEY = 'face_wish_map_11a5';
         let faceWishes = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-        let modelsLoaded = false, opened = false, cameraStarted = false;
-        const video = document.getElementById('video'), aiStatus = document.getElementById('aiStatus');
-        const overlay = document.getElementById('wishOverlay');
-        const bodyEl = document.getElementById('wishBodyEl'), scene = document.getElementById('envScene');
+        let opened = false, processing = false;
+        const video = document.getElementById('video'), aiStatus = document.getElementById('aiStatus'), statusSpan = aiStatus.querySelector('span');
 
-        // iOS specifically needs user gesture sometimes to kickstart video playback
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            document.getElementById('iosHint').style.display = 'block';
-        }
+        // Step 1: Initialize
+        window.addEventListener('load', async () => {
+            statusSpan.textContent = "⏳ Đang chuẩn bị AI...";
+            await loadAI();
+            startCamera();
+        });
 
-        async function loadModels() {
+        // Step 2: Load Models
+        async function loadAI() {
             const URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
             try {
                 await Promise.all([
@@ -513,75 +507,65 @@
                     faceapi.nets.faceLandmark68Net.loadFromUri(URL),
                     faceapi.nets.faceRecognitionNet.loadFromUri(URL)
                 ]);
-                modelsLoaded = true;
-                aiStatus.querySelector('span').textContent = "✨ AI Ready!";
-                setTimeout(() => aiStatus.style.opacity = '0.5', 3000);
-            } catch (e) { aiStatus.querySelector('span').textContent = "⚠️ Error loading AI."; }
+                statusSpan.textContent = "✅ AI đã sẵn sàng!";
+            } catch (e) { statusSpan.textContent = "⚠️ Lỗi nạp AI."; }
         }
 
+        // Step 3: Start Camera with iOS fixes
         async function startCamera() {
-            if (cameraStarted) return;
             try {
-                // Relaxed constraints for older devices
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 400 } }
+                    video: { facingMode: 'user', width: { ideal: 480 }, height: { ideal: 480 } }
                 });
                 video.srcObject = stream;
-                // Force play for iOS
                 video.onloadedmetadata = () => {
                     video.play();
-                    cameraStarted = true;
-                    document.getElementById('iosHint').style.opacity = '0';
+                    statusSpan.textContent = "🔍 Đang rà soát khuôn mặt...";
                     detectLoop();
                 };
             } catch (err) {
-                console.error(err);
-                aiStatus.querySelector('span').textContent = "⚠️ Camera Blocked!";
+                statusSpan.textContent = "⚠️ Cần cấp quyền Camera!";
             }
         }
 
-        // Auto-run on load
-        window.addEventListener('load', async () => {
-            await loadModels();
-            startCamera();
-        });
+        // Backup startup for iOS
+        document.body.addEventListener('click', () => { if (video.paused) video.play(); }, { once: true });
 
-        // Backup user interaction to start camera (iOS requirement often)
-        document.body.addEventListener('click', startCamera, { once: true });
-
+        // Step 4: Robust Detection Loop
         async function detectLoop() {
-            if (opened) return;
-            // CRITICAL: Only detect if video is playing and ready
-            if (video.paused || video.ended || video.readyState < 2) {
+            if (opened || processing) return;
+
+            // Check if video is actually giving frames
+            if (video.readyState < 2) {
                 requestAnimationFrame(detectLoop);
                 return;
             }
 
             try {
-                // Aggressive detection (threshold 0.1 for instant match)
-                const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.1 }))
+                // Larger input size (320) + Very low threshold (0.1) = Super Aggressive
+                const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.1 }))
                     .withFaceLandmarks()
                     .withFaceDescriptor();
 
                 if (det) {
-                    aiStatus.style.opacity = '1';
-                    aiStatus.querySelector('span').textContent = "🌸 Thấy bạn rồi! Đang mở thư...";
-                    handleOpen(det.descriptor);
+                    processing = true;
+                    statusSpan.textContent = "✨ Đã nhận diện! Mở thư...";
+                    handleMatch(det.descriptor);
                 }
-            } catch (e) { /* silent fail */ }
-            if (!opened) requestAnimationFrame(detectLoop);
+            } catch (e) { /* ignore errors in loop */ }
+
+            if (!opened && !processing) requestAnimationFrame(detectLoop);
         }
 
-        function handleOpen(descriptor) {
-            if (opened) return;
+        function handleMatch(descriptor) {
             const currentDesc = Array.from(descriptor);
             let wishIdx = -1;
 
-            // Flexible matching for glasses/hair
+            // Flexible matching (0.7 distance) to account for glasses, hair, lighting
             for (const id in faceWishes) {
                 const stored = faceWishes[id].descriptor;
-                const dist = Math.sqrt(currentDesc.map((v, i) => Math.pow(v - stored[i], 2)).reduce((a, b) => a + b));
-                if (dist < 0.68) { wishIdx = faceWishes[id].idx; break; }
+                const dist = Math.sqrt(currentDesc.reduce((sum, val, i) => sum + Math.pow(val - stored[i], 2), 0));
+                if (dist < 0.7) { wishIdx = faceWishes[id].idx; break; }
             }
 
             if (wishIdx === -1) {
@@ -589,37 +573,38 @@
                 faceWishes[Date.now()] = { descriptor: currentDesc, idx: wishIdx };
                 localStorage.setItem(LS_KEY, JSON.stringify(faceWishes));
             }
-            openLetter(WISHES[wishIdx]);
+            showWish(WISHES[wishIdx]);
         }
 
-        function openLetter(wish) {
-            if (opened) return;
+        function showWish(wish) {
             opened = true;
-            scene.classList.add('opened');
+            document.getElementById('envScene').classList.add('opened');
             aiStatus.style.opacity = '0';
             setTimeout(() => {
                 burst();
-                bodyEl.textContent = wish;
-                overlay.classList.add('show');
+                document.getElementById('wishBodyEl').textContent = wish;
+                document.getElementById('wishOverlay').classList.add('show');
             }, 700);
         }
 
-        scene.addEventListener('click', () => {
-            if (!opened) openLetter(WISHES[Math.floor(Math.random() * WISHES.length)]);
-        });
-
+        // Close logic
         document.getElementById('btnClose').addEventListener('click', () => {
-            overlay.classList.remove('show');
+            document.getElementById('wishOverlay').classList.remove('show');
             setTimeout(() => {
-                opened = false;
-                scene.classList.remove('opened');
+                opened = false; processing = false;
+                document.getElementById('envScene').classList.remove('opened');
                 aiStatus.style.opacity = '1';
-                aiStatus.querySelector('span').textContent = "🔍 Ready...";
+                statusSpan.textContent = "🔍 Đang đợi người tiếp theo...";
                 detectLoop();
             }, 500);
         });
 
-        /* Background Particles */
+        // Manual backup
+        document.getElementById('envScene').addEventListener('click', () => {
+            if (!opened) showWish(WISHES[Math.floor(Math.random() * WISHES.length)]);
+        });
+
+        /* Particles */
         const cv = document.getElementById('bg'), cx = cv.getContext('2d');
         let W, H, parts = [];
         function resize() { W = cv.width = innerWidth; H = cv.height = innerHeight; }
@@ -628,19 +613,19 @@
             constructor(b = false) {
                 this.b = b; this.x = b ? W / 2 : Math.random() * W; this.y = b ? H * 0.5 : -20;
                 this.vx = (Math.random() - 0.5) * (b ? 14 : 1.2); this.vy = b ? -(Math.random() * 12 + 6) : Math.random() * 2 + 1;
-                this.c = ['🌸', '✨', '💕', '🌷', '🎀', '💖', '💎'][Math.floor(Math.random() * 7)]; this.sz = Math.random() * 16 + 14;
-                this.age = 0; this.life = b ? 120 : Infinity;
+                this.c = ['🌸', '✨', '💕', '🌷', '🎀', '💖'][Math.floor(Math.random() * 6)]; this.sz = Math.random() * 15 + 15;
+                this.age = 0; this.life = b ? 100 : Infinity;
             }
             tick() {
                 this.x += this.vx; this.y += this.vy; this.age++;
-                if (this.b) this.vy += 0.22;
+                if (this.b) this.vy += 0.25;
                 if (!this.b && this.y > H) this.y = -20;
                 return this.b && this.age > this.life;
             }
             draw() { cx.font = this.sz + 'px serif'; cx.fillText(this.c, this.x, this.y); }
         }
         function burst() { for (let i = 0; i < 50; i++) parts.push(new P(true)); }
-        for (let i = 0; i < 35; i++) parts.push(new P());
+        for (let i = 0; i < 30; i++) parts.push(new P());
         (function loop() { cx.clearRect(0, 0, W, H); parts = parts.filter(p => !p.tick()); parts.forEach(p => p.draw()); requestAnimationFrame(loop); })();
     </script>
 </body>
