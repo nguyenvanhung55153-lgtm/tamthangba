@@ -497,10 +497,16 @@
         const hands = new Hands({
             locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
         });
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1, // Increased from 0 to 1 for better stability/accuracy
+            minDetectionConfidence: 0.6, // Increased to avoid ghost hands
+            minTrackingConfidence: 0.6
+        });
         hands.onResults((results) => {
             if (opened || processing) return;
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                // Check if hand is stable (basic check)
                 processing = true;
                 statusSpan.textContent = "🖐️ Đã thấy tay! Mở thư ngay...";
                 handleMatch(null);
@@ -545,6 +551,7 @@
         document.body.addEventListener('click', () => { if (video.paused) video.play(); }, { once: true });
 
         // Step 3: Multi-AI Tracking Loop
+        let faceDetectCount = 0;
         async function aiLoop() {
             if (opened || processing) return;
             if (video.readyState < 2) { requestAnimationFrame(aiLoop); return; }
@@ -554,13 +561,21 @@
 
             // Face Check (Optimized 160px)
             try {
-                const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.15 }))
+                // Increased scoreThreshold to 0.4 to avoid ghost faces in background
+                const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.4 }))
                     .withFaceLandmarks().withFaceDescriptor();
 
                 if (det) {
-                    processing = true;
-                    statusSpan.textContent = "✨ Thấy mặt rồi! Mở thư...";
-                    handleMatch(det.descriptor);
+                    faceDetectCount++;
+                    // Require 2 consecutive frames for face to be extra sure (still fast)
+                    if (faceDetectCount >= 2) {
+                        processing = true;
+                        statusSpan.textContent = "✨ Thấy mặt bạn rồi! Mở thư...";
+                        handleMatch(det.descriptor);
+                        faceDetectCount = 0;
+                    }
+                } else {
+                    faceDetectCount = 0;
                 }
             } catch (e) { }
 
