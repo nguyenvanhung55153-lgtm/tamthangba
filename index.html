@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#fde8f5" />
-    <title>Chúc Mừng 8/3 – Lớp 11A5 💖</title>
-    <meta name="description" content="Website chúc mừng 8/3 dành riêng cho các cô gái lớp 11A5." />
+    <title>Chúc Mừng 8/3 – Lớp 11A5 💖 AI Vision</title>
+    <meta name="description" content="Website chúc mừng 8/3 tích hợp AI nhận diện khuôn mặt." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -36,7 +36,6 @@
             overflow: hidden;
             touch-action: manipulation;
             -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
         }
 
         body {
@@ -47,11 +46,7 @@
             justify-content: center;
             position: relative;
             min-height: 100svh;
-            min-height: 100dvh;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         /* ═══ CANVAS ═══ */
@@ -62,61 +57,75 @@
             z-index: 0;
         }
 
-        /* ═══ ALREADY-OPENED SCREEN ═══ */
-        #alreadyScreen {
+        /* ═══ AI UI ═══ */
+        #aiStatus {
             position: fixed;
-            inset: 0;
-            z-index: 600;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(ellipse 120% 100% at 50% 0%, #fde8f5, #fef3fb 50%, #f5f0ff);
-            flex-direction: column;
-            gap: 1.1rem;
-            text-align: center;
-            padding: calc(1.5rem + env(safe-area-inset-top)) calc(1.5rem + env(safe-area-inset-right)) calc(1.5rem + env(safe-area-inset-bottom)) calc(1.5rem + env(safe-area-inset-left));
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        #alreadyScreen.show {
-            display: flex;
-            animation: fadeIn .9s ease both;
-        }
-
-        .al-icon {
-            font-size: clamp(3.5rem, 13vw, 5.8rem);
-            animation: floatGently 3.5s ease-in-out infinite;
-        }
-
-        .al-title {
-            font-family: 'Dancing Script', cursive;
-            font-size: clamp(1.7rem, 6.5vw, 2.8rem);
-            font-weight: 700;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 0.95rem;
             color: #be185d;
-            line-height: 1.2;
+            box-shadow: 0 8px 32px rgba(190, 24, 93, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            display: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            font-weight: 600;
         }
 
-        .al-sub {
-            font-size: clamp(1rem, 3.4vw, 1.15rem);
-            color: #7c3aed;
-            font-weight: 500;
-            max-width: 360px;
-            line-height: 1.7;
+        #aiBtn {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: linear-gradient(135deg, #f472b6, #7c3aed);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: pulseBtn 2s infinite;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .al-wish {
-            background: rgba(255, 255, 255, .82);
-            border: 2px solid rgba(249, 168, 212, .55);
-            border-radius: 22px;
-            padding: 1.1rem 1.7rem;
-            font-size: clamp(.95rem, 3.2vw, 1.1rem);
-            color: #5b21b6;
-            font-weight: 500;
-            line-height: 1.8;
-            max-width: 370px;
-            box-shadow: 0 8px 32px #f472b618;
-            backdrop-filter: blur(10px);
+        #aiBtn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        @keyframes pulseBtn {
+            0% {
+                box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(244, 114, 182, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 114, 182, 0);
+            }
+        }
+
+        video#video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* ═══ ENV WRAP ═══ */
@@ -126,37 +135,27 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: clamp(.8rem, 3vw, 1.3rem);
+            gap: 1.3rem;
         }
 
         .env-label {
             font-family: 'Dancing Script', cursive;
-            font-size: clamp(1.05rem, 4.5vw, 2.1rem);
+            font-size: clamp(1.2rem, 5vw, 2.2rem);
             font-weight: 700;
             color: #db2777;
             text-shadow: 0 2px 14px #fbcfe860;
-            letter-spacing: .03em;
-            animation: dropIn .8s cubic-bezier(.34, 1.56, .64, 1) both;
-            white-space: normal;
             text-align: center;
             max-width: 92vw;
             line-height: 1.35;
         }
 
-        /* ═══ ENVELOPE ═══ */
         .env-scene {
             perspective: 1200px;
             cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
             animation: floatBob 5s ease-in-out infinite;
             transition: filter .25s;
             user-select: none;
-            touch-action: manipulation;
-            -webkit-user-select: none;
-        }
-
-        .env-scene:hover {
-            filter: drop-shadow(0 28px 52px #e879c068);
+            -webkit-tap-highlight-color: transparent;
         }
 
         .env-scene.opened {
@@ -170,21 +169,15 @@
             height: min(375px, 65vw);
         }
 
-        /* Outer envelope body */
         .env-body {
             position: absolute;
             inset: 0;
-            /* Soft cream-pink — easy on eyes */
             background: linear-gradient(160deg, #fff8fd 0%, #ffe8f7 55%, #ffd8f0 100%);
             border-radius: 20px;
-            box-shadow:
-                0 24px 70px rgba(244, 114, 182, .38),
-                0 6px 22px rgba(0, 0, 0, .08),
-                inset 0 1.5px 0 rgba(255, 255, 255, .9);
+            box-shadow: 0 24px 70px rgba(244, 114, 182, .38), 0 6px 22px rgba(0, 0, 0, .08);
             overflow: hidden;
         }
 
-        /* Bottom V */
         .env-body::before {
             content: '';
             position: absolute;
@@ -196,37 +189,32 @@
             border-top: calc(min(375px, 65vw)*.44) solid transparent;
         }
 
-        /* Side folds */
         .env-left,
         .env-right {
             position: absolute;
             top: 0;
             height: 100%;
+            border-style: solid;
         }
 
         .env-left {
             left: 0;
-            border-style: solid;
             border-width: calc(min(375px, 65vw)/2) 0 calc(min(375px, 65vw)/2) calc(min(540px, 90vw)*.35);
             border-color: transparent transparent transparent #f9bde3;
         }
 
         .env-right {
             right: 0;
-            border-style: solid;
             border-width: calc(min(375px, 65vw)/2) calc(min(540px, 90vw)*.35) calc(min(375px, 65vw)/2) 0;
             border-color: transparent #f9bde3 transparent transparent;
         }
 
-        /* ─── FLAP ─── */
         .env-flap {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            transform-style: preserve-3d;
             transform-origin: top center;
-            transform: rotateX(0deg);
             transition: transform .72s cubic-bezier(.4, 0, .2, 1);
             z-index: 6;
         }
@@ -240,7 +228,6 @@
             transform: rotateX(-180deg);
         }
 
-        /* ─── SEAL ─── */
         .seal {
             position: absolute;
             top: 50%;
@@ -248,27 +235,23 @@
             transform: translate(-50%, -50%);
             font-size: clamp(2.5rem, 8vw, 4rem);
             z-index: 7;
-            filter: drop-shadow(0 4px 12px #c2185b55);
-            animation: sealBeat 1.8s ease-in-out infinite;
-            transition: transform .4s ease, opacity .4s ease;
-            pointer-events: none;
+            animation: sealBeat 1.8s infinite;
+            transition: all .4s;
         }
 
         .env-scene.opened .seal {
             opacity: 0;
-            transform: translate(-50%, -50%) scale(0) rotate(60deg);
+            transform: translate(-50%, -50%) scale(0);
         }
 
-        /* ─── PEEKING LETTER ─── */
         .env-letter {
             position: absolute;
             bottom: 9%;
             left: 50%;
             width: 74%;
-            transform: translateX(-50%) translateY(2px);
+            transform: translateX(-50%);
             z-index: 4;
             transition: transform .65s .1s cubic-bezier(.22, 1, .36, 1);
-            pointer-events: none;
         }
 
         .env-letter-inner {
@@ -279,54 +262,35 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(1.05rem, 3.6vw, 1.5rem);
+            font-size: clamp(1rem, 3.6vw, 1.5rem);
             color: #ec4899;
-            letter-spacing: .08em;
             font-weight: 700;
-            box-shadow: 0 3px 16px rgba(244, 114, 182, .15);
         }
 
         .env-scene.opened .env-letter {
             transform: translateX(-50%) translateY(-70%);
         }
 
-        /* ─── TAP HINT ─── */
         .tap-hint {
-            font-size: clamp(.82rem, 3vw, 1.05rem);
+            font-size: clamp(.85rem, 3vw, 1.1rem);
             color: #be185d;
-            letter-spacing: .04em;
             font-weight: 600;
-            animation: hintPop 2.3s ease-in-out infinite;
-            transition: opacity .4s;
-            user-select: none;
-            -webkit-user-select: none;
-            white-space: normal;
             text-align: center;
-            max-width: 90vw;
-            line-height: 1.6;
+            animation: hintPop 2.3s infinite;
         }
 
-        .tap-hint .bounce {
-            display: inline-block;
-            animation: hintBounce 1.1s ease-in-out infinite;
-        }
-
-        /* ═══════════════════════════════
-   WISH OVERLAY
-═══════════════════════════════ */
+        /* ═══ WISH OVERLAY ═══ */
         .wish-overlay {
             position: fixed;
             inset: 0;
-            z-index: 400;
+            z-index: 2000;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
-            padding: calc(env(safe-area-inset-top) + clamp(1rem, 5vw, 2rem)) calc(env(safe-area-inset-right) + clamp(.8rem, 3vw, 1.4rem)) calc(env(safe-area-inset-bottom) + clamp(.8rem, 3vw, 1.4rem)) calc(env(safe-area-inset-left) + clamp(.8rem, 3vw, 1.4rem));
+            padding: 20px;
             pointer-events: none;
             opacity: 0;
-            transition: opacity .1s;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            transition: opacity .4s;
         }
 
         .wish-overlay.show {
@@ -334,204 +298,71 @@
             opacity: 1;
         }
 
-        /* Soft backdrop */
         .wish-backdrop {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(253, 232, 245, .85), rgba(245, 240, 255, .85));
-            backdrop-filter: blur(22px) saturate(1.4);
-            -webkit-backdrop-filter: blur(22px) saturate(1.4);
-            opacity: 0;
-            transition: opacity .5s ease;
+            background: rgba(253, 232, 245, 0.85);
+            backdrop-filter: blur(20px);
         }
 
-        .wish-overlay.show .wish-backdrop {
-            opacity: 1;
-        }
-
-        /* ─── CARD ─── */
         .wish-card {
             position: relative;
             z-index: 2;
             width: 100%;
-            max-width: 490px;
-            margin: auto 0;
-            background: linear-gradient(160deg, rgba(255, 255, 255, .97), rgba(255, 240, 252, .99));
-            border-radius: 26px;
-            padding: clamp(1.9rem, 5.5vw, 2.8rem) clamp(1.3rem, 4.5vw, 2.4rem) clamp(1.5rem, 5vw, 2.4rem);
-            box-shadow:
-                0 28px 70px rgba(232, 121, 192, .35),
-                0 8px 28px rgba(0, 0, 0, .09),
-                inset 0 1.5px 0 rgba(255, 255, 255, .95);
-            border: 2px solid rgba(249, 168, 212, .5);
-            transform: translateY(80px) scale(.84) rotateX(8deg);
-            opacity: 0;
-            transition:
-                transform .62s .15s cubic-bezier(.34, 1.56, .64, 1),
-                opacity .48s .15s ease;
+            max-width: 500px;
+            background: white;
+            border-radius: 30px;
+            padding: 40px 30px;
+            border: 2px solid #f9a8d4;
             text-align: center;
-            overflow: visible;
-            transform-style: preserve-3d;
+            transform: translateY(50px) scale(0.9);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .wish-overlay.show .wish-card {
-            transform: translateY(0) scale(1) rotateX(0deg);
-            opacity: 1;
+            transform: translateY(0) scale(1);
         }
 
-
-
-        /* Ribbon tag */
-        .ribbon {
-            position: absolute;
-            top: -22px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(90deg, #f9a8d4, #e879c0, #a855f7);
-            color: #fff;
-            font-family: 'Dancing Script', cursive;
-            font-size: clamp(.82rem, 2.5vw, .97rem);
-            font-weight: 700;
-            padding: .34rem 1.6rem;
-            border-radius: 100px;
-            box-shadow: 0 4px 16px rgba(232, 121, 192, .45);
-            white-space: nowrap;
-            letter-spacing: .07em;
-        }
-
-        /* Date display */
         .date-badge {
             font-family: 'Dancing Script', cursive;
-            font-size: clamp(2.5rem, 9vw, 4rem);
+            font-size: 4rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #f472b6, #c026d3, #7c3aed);
+            background: linear-gradient(135deg, #f472b6, #7c3aed);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: .9rem;
+            margin-bottom: 10px;
             display: block;
-            filter: drop-shadow(0 2px 8px rgba(244, 114, 182, .4));
-            animation: badgeGlow 2.8s ease-in-out infinite;
-            line-height: 1.1;
         }
 
-        /* ─── WISH TEXT (big, cute, readable) ─── */
         .wish-body {
-            font-size: clamp(1.1rem, 3.8vw, 1.35rem);
+            font-size: 1.3rem;
             color: #5b21b6;
-            line-height: 2;
+            line-height: 1.8;
             font-weight: 600;
-            min-height: 4em;
-            transition: opacity .28s;
-            letter-spacing: .01em;
-        }
-
-        .wish-divider {
-            margin: 1.15rem auto;
-            width: 60px;
-            height: 3.5px;
-            background: linear-gradient(90deg, #f9a8d4, #a855f7, #f9a8d4);
-            border-radius: 10px;
+            margin: 20px 0;
         }
 
         .wish-sig {
             font-family: 'Dancing Script', cursive;
-            font-size: clamp(1.05rem, 3.8vw, 1.3rem);
+            font-size: 1.3rem;
             color: #be185d;
             font-weight: 700;
-            margin-top: .5rem;
-        }
-
-        .wish-actions {
-            display: flex;
-            gap: .8rem;
-            justify-content: center;
-            margin-top: 1.5rem;
-        }
-
-        .btn {
-            padding: .7rem 1.7rem;
-            border: none;
-            border-radius: 100px;
-            font-family: 'Baloo 2', cursive;
-            font-weight: 700;
-            font-size: clamp(.88rem, 2.6vw, 1rem);
-            cursor: pointer;
-            transition: transform .18s, box-shadow .18s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn:active {
-            transform: scale(.93) !important;
         }
 
         .btn-close {
+            margin-top: 25px;
             background: linear-gradient(135deg, #f9a8d4, #e879c0);
-            color: #fff;
-            box-shadow: 0 5px 22px rgba(232, 121, 192, .5);
-            letter-spacing: .03em;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-family: 'Baloo 2', cursive;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(232, 121, 192, 0.4);
         }
 
-        .btn-close:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(232, 121, 192, .7);
-        }
-
-        /* ─── SPARKLE DOTS decorating the card ─── */
-        .card-deco {
-            position: absolute;
-            pointer-events: none;
-            font-size: 1.2rem;
-            animation: sparkleFloat 3s ease-in-out infinite;
-        }
-
-        .card-deco:nth-child(1) {
-            top: -10px;
-            left: 18px;
-            animation-delay: 0s;
-        }
-
-        .card-deco:nth-child(2) {
-            top: -10px;
-            right: 18px;
-            animation-delay: .5s;
-        }
-
-        .card-deco:nth-child(3) {
-            bottom: 16px;
-            left: 12px;
-            animation-delay: 1s;
-        }
-
-        .card-deco:nth-child(4) {
-            bottom: 16px;
-            right: 12px;
-            animation-delay: 1.5s;
-        }
-
-        /* ═══ KEYFRAMES ═══ */
-        @keyframes fadeIn {
-            from {
-                opacity: 0
-            }
-
-            to {
-                opacity: 1
-            }
-        }
-
-        @keyframes dropIn {
-            from {
-                opacity: 0;
-                transform: translateY(-32px) scale(.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-
+        /* Animations */
         @keyframes floatBob {
 
             0%,
@@ -544,35 +375,14 @@
             }
         }
 
-        @keyframes floatGently {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
         @keyframes sealBeat {
 
             0%,
-            55%,
             100% {
                 transform: translate(-50%, -50%) scale(1);
             }
 
-            14% {
-                transform: translate(-50%, -50%) scale(1.3);
-            }
-
-            28% {
-                transform: translate(-50%, -50%) scale(1.06);
-            }
-
-            42% {
+            50% {
                 transform: translate(-50%, -50%) scale(1.2);
             }
         }
@@ -581,71 +391,10 @@
 
             0%,
             100% {
-                opacity: .6;
+                opacity: 0.5;
             }
 
             50% {
-                opacity: 1;
-            }
-        }
-
-        @keyframes hintBounce {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-7px);
-            }
-        }
-
-        @keyframes badgeGlow {
-
-            0%,
-            100% {
-                filter: drop-shadow(0 2px 8px rgba(244, 114, 182, .4));
-            }
-
-            50% {
-                filter: drop-shadow(0 4px 20px rgba(124, 58, 237, .55));
-            }
-        }
-
-        /* ─── reduced motion: disable heavy animations ─── */
-        @media (prefers-reduced-motion: reduce) {
-            .env-scene {
-                animation: none !important;
-            }
-
-            .seal {
-                animation: none !important;
-            }
-
-            .card-deco {
-                animation: none !important;
-            }
-
-            .al-icon {
-                animation: none !important;
-            }
-
-            .tap-hint {
-                animation: none !important;
-            }
-        }
-
-        @keyframes sparkleFloat {
-
-            0%,
-            100% {
-                transform: translateY(0) scale(1);
-                opacity: .8;
-            }
-
-            50% {
-                transform: translateY(-5px) scale(1.2);
                 opacity: 1;
             }
         }
@@ -653,272 +402,211 @@
 </head>
 
 <body>
-
     <canvas id="bg"></canvas>
+    <video id="video" autoplay muted playsinline></video>
+    <div id="aiStatus">Đang khởi động AI...</div>
+    <button id="aiBtn">✨ Bật AI Nhận Diện & Mở Thư ✨</button>
 
-    <!-- Already opened -->
-    <div id="alreadyScreen">
-        <div class="al-icon">💌</div>
-        <p class="al-title">Bạn đã mở thư rồi nhé! 🌸</p>
-        <p class="al-sub">Mỗi người chỉ được mở một lần thôi 💕<br />Lời chúc dành riêng cho bạn là:</p>
-        <div class="al-wish" id="alreadyWishEl"></div>
-    </div>
-
-    <!-- Envelope -->
     <div id="envWrap">
-        <p class="env-label">💌 Lớp 11A5 · Chúc Mừng 8/3 💌</p>
-
-        <div class="env-scene" id="envScene" role="button" tabindex="0" aria-label="Bấm để mở phong thư">
+        <p class="env-label">🌸 Lớp 11A5 · Chúc Mừng 8/3 🌸</p>
+        <div class="env-scene" id="envScene">
             <div class="env-box">
                 <div class="env-body">
                     <div class="env-left"></div>
                     <div class="env-right"></div>
-
-                    <!-- flap -->
                     <div class="env-flap">
                         <svg viewBox="0 0 540 210" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                             <defs>
                                 <linearGradient id="fG" x1="0" y1="0" x2="1" y2="1">
                                     <stop offset="0%" stop-color="#fba8d8" />
-                                    <stop offset="50%" stop-color="#e879c0" />
                                     <stop offset="100%" stop-color="#9333ea" />
                                 </linearGradient>
                             </defs>
-                            <polygon points="0,0 540,0 270,198" fill="url(#fG)" opacity=".88" />
-                            <polygon points="0,0 540,0 270,184" fill="#fce4f7" opacity=".5" />
+                            <polygon points="0,0 540,0 270,198" fill="url(#fG)" />
                         </svg>
                     </div>
-
-                    <!-- seal -->
                     <div class="seal">💝</div>
-
-                    <!-- peeking letter -->
                     <div class="env-letter">
-                        <div class="env-letter-inner">🌸 &nbsp; 8 / 3 &nbsp; 🌸</div>
+                        <div class="env-letter-inner">🌸 8 / 3 / 2026 🌸</div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <p class="tap-hint" id="tapHint"><span class="bounce">💌</span>&nbsp; Bấm vào để mở thư yêu thương!</p>
+        <p class="tap-hint"><span class="bounce">💌</span> Mỉm cười để mở thư nhé!</p>
     </div>
 
-    <!-- Wish overlay -->
-    <div class="wish-overlay" id="wishOverlay" aria-modal="true" role="dialog">
+    <div class="wish-overlay" id="wishOverlay">
         <div class="wish-backdrop"></div>
-        <div class="wish-card" id="wishCard">
-            <!-- corner sparkles -->
-            <span class="card-deco">✨</span>
-            <span class="card-deco">🌸</span>
-            <span class="card-deco">💕</span>
-            <span class="card-deco">✨</span>
-
-            <div class="ribbon">🎀 Lớp 11A5 &nbsp;·&nbsp; 8 / 3 / 2026 🎀</div>
+        <div class="wish-card">
             <span class="date-badge">8 · 3</span>
             <p class="wish-body" id="wishBodyEl"></p>
-            <div class="wish-divider"></div>
-            <p class="wish-sig">— Từ cả lớp 11A5 với tất cả yêu thương 💕 —</p>
-            <div class="wish-actions">
-                <button class="btn btn-close" id="btnClose">💖 Đóng thư lại</button>
-            </div>
+            <div style="width:60px;height:3px;background:#f9a8d4;margin:15px auto;border-radius:10px;"></div>
+            <p class="wish-sig">— Từ tập thể nam 11A5 gửi tới bạn 💕 —</p>
+            <button class="btn-close" id="btnClose">💖 Đóng thư lại</button>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script>
-        /* ── WISHES ── */
         const WISHES = [
-            "Chúc bạn 8/3 luôn xinh đẹp, vui vẻ và hạnh phúc mỗi ngày 🌷",
-            "Mong rằng nụ cười của bạn sẽ luôn rạng rỡ như hôm nay 💕",
-            "Chúc bạn luôn đạt được những điều mình mong muốn 🎀",
-            "Hy vọng bạn sẽ luôn mạnh mẽ và tự tin theo đuổi ước mơ 🌸",
-            "Chúc bạn học giỏi hơn nữa và luôn gặp may mắn 🌟",
-            "Mong bạn có một ngày 8/3 thật ý nghĩa và ngập tràn yêu thương 💖",
-            "Chúc bạn luôn là phiên bản tuyệt vời nhất của chính mình 🌼",
-            "Hy vọng mọi điều tốt đẹp nhất sẽ đến với bạn 💝",
-            "Chúc bạn luôn được yêu thương và trân trọng 🌺",
-            "Mong rằng tuổi trẻ của bạn sẽ thật rực rỡ 🌻",
-            "Chúc bạn lúc nào cũng cười thật tươi 😊",
-            "Hy vọng bạn sẽ có thật nhiều niềm vui trong cuộc sống 🎉",
-            "Chúc bạn luôn bình an và hạnh phúc 💗",
-            "Mong rằng mọi dự định của bạn đều thành công 🌷",
-            "Chúc bạn luôn tỏa sáng theo cách riêng của mình ✨",
-            "Hy vọng bạn sẽ luôn tự tin và yêu bản thân nhiều hơn 💕",
-            "Chúc bạn có một ngày 8/3 thật đặc biệt 🎀",
-            "Mong bạn luôn gặp những điều tốt đẹp nhất 🌸",
-            "Chúc bạn luôn tràn đầy năng lượng tích cực 🌟",
-            "Hy vọng bạn sẽ đạt được mọi ước mơ của mình 💖",
-            "Chúc bạn luôn được bao quanh bởi những người yêu thương 💝",
-            "Mong bạn mãi giữ được sự hồn nhiên và đáng yêu 🌼",
-            "Chúc bạn thành công trong học tập và cuộc sống 🌺",
-            "Hy vọng bạn sẽ luôn cảm thấy mình thật quý giá 🌻",
-            "Chúc bạn một ngày 8/3 thật trọn vẹn và hạnh phúc 💗"
+            "Chúc bạn 8/3 rạng rỡ như đóa hoa hướng dương, luôn hướng về phía mặt trời và tràn đầy năng lượng! 🌻",
+            "Nụ cười của cậu chính là món quà tuyệt vời nhất mà 11A5 có được. Mãi hạnh phúc nhé! 😊",
+            "Chúc nàng thơ của lớp mình luôn xinh đẹp, dịu dàng và thành công rực rỡ trên con đường đã chọn. 🌸",
+            "Bạn là một cô gái rất đặc biệt. Hy vọng ngày 8/3 này mang đến cho bạn thật nhiều niềm vui bất ngờ! 🎁",
+            "Học giỏi, xinh gái lại còn đáng yêu, chúc bạn 8/3 này nhận được thật nhiều quà và lời chúc ý nghĩa! 🎀",
+            "Mong rằng mỗi sớm mai thức dậy, bạn đều thấy mình xinh tươi và yêu đời hơn hôm qua. 💖",
+            "Gửi đến bạn cả một bầu trời thương nhớ và những lời chúc tốt đẹp nhất nhân ngày quốc tế phụ nữ. 🎈",
+            "Chúc bạn luôn giữ vững sự tự tin, bản lĩnh để chinh phục mọi ước mơ của mình nhé! 🌟",
+            "Ngày 8/3, chúc bạn không chỉ đẹp ở vẻ ngoài mà còn luôn giữ được tâm hồn trong sáng, thánh thiện. ✨",
+            "Bạn xứng đáng có được những điều tốt đẹp nhất thế gian này. Chúc bạn một ngày cực kỳ trọn vẹn! 🌷",
+            "Mong cho nụ cười trên môi bạn không bao giờ tắt dẫu cuộc sống có đôi lúc khó khăn. Cố lên nhé! 💪",
+            "Gửi ngàn nụ hôn và lời chúc ấm áp nhất đến cô gái đang đọc thư này. Happy Woman's Day! 💋",
+            "Chúc bạn 8/3 thật ý nghĩa bên gia đình và những người thân yêu nhất của mình. 🏠",
+            "Bạn là mảnh ghép không thể thiếu của lớp mình. Cảm ơn bạn vì đã luôn tuyệt vời như thế! 🧩",
+            "Mong rằng tuổi trẻ của bạn sẽ là những trang nhật ký đầy màu sắc và những kỷ niệm ngọt ngào. 📖",
+            "Chúc bạn luôn là bông hoa đẹp nhất, ngào ngạt hương thơm trong vườn hoa 11A5. 🌺",
+            "Hy vọng bạn sẽ gặp được một người đủ tử tế để nâng niu và yêu thương bạn thật lòng. 💝",
+            "8/3 chúc bạn nhận được thật nhiều 'vibe' tích cực và luôn bừng sáng trong mọi khoảnh khắc! ⚡",
+            "Hãy cứ là chính mình, bởi vì phiên bản hiện tại của bạn đã vô cùng tuyệt vời rồi! 🌈",
+            "Chúc bạn ăn thật ngon, ngủ thật sâu và mỗi ngày đều là một ngày vui vẻ vô tư lự. 🍧",
+            "Gửi đến bạn lời chúc sức khỏe, may mắn và hạnh phúc bền vững. Yêu bạn rất nhiều! 💗",
+            "Mong bạn luôn gặp được những điều may mắn nhỏ bé nhưng mang lại niềm vui cực lớn mỗi ngày. 🍀",
+            "Chúc cô gái của tôi 8/3 ngập tràn hoa, quà và những lời tỏ tình siêu ngọt ngào nhé! 🕯️",
+            "Dù sau này chúng ta có ở đâu, mong bạn vẫn luôn nhớ về những kỷ niệm đẹp của lớp 11A5. 🕰️",
+            "Chúc bạn có một ngày 8/3 'chill' hết nấc và nhận được mọi thứ mình mong muốn! 🥂",
+            "Nàng là công chúa trong lòng mọi người rồi, hãy cứ kiêu sa và lộng lẫy như thế nhé! 👑",
+            "Chúc bạn luôn tìm thấy niềm vui trong những điều giản đơn nhất của cuộc sống. 🍃",
+            "Mong cho đôi mắt bạn luôn sáng lấp lánh niềm tin và hy vọng vào tương lai phía trước. 👀",
+            "Gửi tới bạn một cái ôm thật chặt và lời chúc 8/3 ấm áp từ tận sâu trái tim mình. 🤗",
+            "Chúc mừng ngày của phái đẹp! Chúc bạn mãi là nữ thần trong mắt những người xung quanh. 🗽",
+            "Hôm nay bạn đẹp lắm, và tôi muốn bạn biết rằng bạn luôn xứng đáng được tôn trọng. 💎",
+            "Chúc bạn có một ngày lễ thật rộn ràng tiếng cười và ngập tràn hạnh phúc bên bạn bè. 🎊",
+            "Mong cho con đường học tập của bạn luôn suôn sẻ và gặt hái được nhiều điểm 10 rực rỡ! 💯",
+            "Chúc bạn luôn bình yên giữa dòng đời hối hả, mỗi bước đi đều có thiên thần hộ mệnh che chở. 👼",
+            "Hãy để niềm vui dẫn lối cho bạn trong ngày đặc biệt này. Happy 8/3 my friend! 💃",
+            "Chúc bạn có sức khỏe dẻo dai để đi khắp thế gian và khám phá những điều thú vị nhất. 🌍",
+            "Mong rằng mọi nỗi buồn của bạn sẽ tan biến như bọt bong bóng, chỉ còn lại niềm vui ở lại. 🫧",
+            "Bạn là một cô gái mạnh mẽ hơn bạn tưởng. Chúc bạn 8/3 luôn kiên cường và rạng rỡ! 🛡️",
+            "Gửi bạn đóa hoa hồng thắm thay cho lời muốn nói: Bạn thực sự rất tuyệt vời! 🌹",
+            "Chúc bạn luôn là tâm điểm của mọi sự chú ý nhờ tài năng và sự thông minh của mình. 🧠",
+            "Hy vọng trái tim bạn sẽ luôn ấm áp và tràn đầy yêu thương dành cho mọi người. ❤️",
+            "Chúc bạn có một ngày 8/3 thật 'fancy' và sành điệu theo cách mà bạn muốn! 👠",
+            "Mong cho những điều ước của bạn trong ngày hôm nay đều trở thành hiện thực! 🌠",
+            "Gửi lời chúc mừng đến cô gái thông minh nhất lớp! Chúc bạn 8/3 thành công vang dội. 🎓",
+            "Chúc bạn luôn là một 'ngôi sao' tỏa sáng theo cách riêng, không cần phải giống bất kỳ ai. ⭐",
+            "Mong bạn luôn nhận được sự quan tâm chu đáo từ những người thân yêu nhất xung quanh mình. 🍬",
+            "Chúc bạn ngày 8/3 thật an nhiên, thanh thản và ngập tràn những suy nghĩ tích cực. 🧘",
+            "Hãy cứ mỉm cười và cả thế giới sẽ mỉm cười lại với bạn. Chúc mừng ngày 8/3! 😄",
+            "Gửi bạn một chút ngọt ngào của kẹo, một chút nồng nàn của hoa cho ngày 8/3 thăng hoa. 🍭",
+            "Mãi là thành viên tuyệt vời nhất của gia đình 11A5 nhé! Chúc bạn 8/3 vô cùng hạnh phúc! 💕"
         ];
 
-        /* ── 5-OPEN LIMIT ── */
-        const LS_KEY = 'opened_83_11a5_2026';
-        const LS_CNT = 'opened_83_11a5_cnt';
-        const MAX_OPEN = 5;
+        const LS_KEY = 'face_wish_map_11a5';
+        let faceWishes = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+        let modelsLoaded = false, opened = false;
+        const video = document.getElementById('video'), aiStatus = document.getElementById('aiStatus');
+        const aiBtn = document.getElementById('aiBtn'), overlay = document.getElementById('wishOverlay');
+        const bodyEl = document.getElementById('wishBodyEl'), scene = document.getElementById('envScene');
 
-        let openCount = parseInt(localStorage.getItem(LS_CNT) || '0', 10);
-        const savedWish = localStorage.getItem(LS_KEY);
-
-        if (openCount >= MAX_OPEN && savedWish) {
-            document.getElementById('alreadyWishEl').textContent = savedWish;
-            document.getElementById('alreadyScreen').classList.add('show');
-            document.getElementById('envWrap').style.display = 'none';
+        async function loadModels() {
+            aiStatus.style.display = 'block';
+            aiStatus.textContent = "⌛ Đang nạp bộ não AI (vui lòng đợi)...";
+            const URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri(URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(URL),
+                faceapi.nets.faceExpressionNet.loadFromUri(URL)
+            ]);
+            modelsLoaded = true;
+            aiStatus.textContent = "✅ AI đã sẵn sàng!";
+            setTimeout(() => aiStatus.style.opacity = '0', 2000);
         }
 
-        /* ── ENVELOPE LOGIC ── */
-        const scene = document.getElementById('envScene');
-        const overlay = document.getElementById('wishOverlay');
-        const bodyEl = document.getElementById('wishBodyEl');
-        const tapHint = document.getElementById('tapHint');
-        let opened = false;
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                video.srcObject = stream;
+                aiBtn.style.display = 'none';
+                aiStatus.style.opacity = '1';
+                aiStatus.textContent = "🔍 Đang tìm khuôn mặt...";
+                detect();
+            } catch (err) { alert("Hãy cấp quyền Camera để AI có thể nhìn thấy nụ cười của bạn nhé!"); }
+        }
 
-        function openEnvelope() {
+        async function detect() {
             if (opened) return;
+            const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions().withFaceDescriptor();
+            if (det) {
+                aiStatus.textContent = "🌸 Thấy bạn rồi! Mỉm cười để mở nhé...";
+                if (det.expressions.happy > 0.8) handleOpen(det.descriptor);
+            } else { aiStatus.textContent = "🔍 Đang tìm khuôn mặt..."; }
+            if (!opened) requestAnimationFrame(detect);
+        }
+
+        function handleOpen(descriptor) {
+            if (opened) return;
+            const currentDesc = Array.from(descriptor);
+            let wishIdx = -1;
+            for (const id in faceWishes) {
+                const dist = Math.sqrt(currentDesc.map((v, i) => Math.pow(v - faceWishes[id].descriptor[i], 2)).reduce((a, b) => a + b));
+                if (dist < 0.5) { wishIdx = faceWishes[id].idx; break; }
+            }
+            if (wishIdx === -1) {
+                wishIdx = Math.floor(Math.random() * WISHES.length);
+                faceWishes[Date.now()] = { descriptor: currentDesc, idx: wishIdx };
+                localStorage.setItem(LS_KEY, JSON.stringify(faceWishes));
+            }
+            openLetter(WISHES[wishIdx]);
+        }
+
+        function openLetter(wish) {
             opened = true;
             scene.classList.add('opened');
-            // hide hint while card animates; restored below if opens remain
-
-            openCount++;
-            localStorage.setItem(LS_CNT, openCount);
-            const wish = WISHES[Math.floor(Math.random() * WISHES.length)];
-            localStorage.setItem(LS_KEY, wish);
-
-            // Update hint with remaining count after this open
-            const rem = MAX_OPEN - openCount;
-            if (rem > 0) {
-                tapHint.style.cssText = 'opacity:0;pointer-events:none;';
-            }
-
-            // Step 1: flap opens (0-700ms)
-            // Step 2: letter peeks up (starts at 100ms via CSS transition)
-            // Step 3: confetti burst + overlay at 600ms
-            setTimeout(() => { burst(); showWish(wish, openCount); }, 600);
-        }
-
-        function showWish(text, count) {
-            bodyEl.textContent = text;
-            bodyEl.style.opacity = '0';
-
-            // Show remaining opens info in the card sig line
-            const rem = MAX_OPEN - count;
-            const sigEl = document.querySelector('.wish-sig');
-            sigEl.innerHTML = rem > 0
-                ? `— Từ cả lớp 11A5 với tất cả yêu thương 💕 —<br/><small style="font-size:.75em;color:#9333ea;font-family:'Baloo 2',cursive;">Bạn còn <strong>${rem}</strong> lần mở thư nữa 🎀</small>`
-                : `— Từ cả lớp 11A5 với tất cả yêu thương 💕 —<br/><small style="font-size:.75em;color:#be185d;font-family:'Baloo 2',cursive;">Đây là lần cuối bạn mở thư rồi nhé 🌸</small>`;
-
-            overlay.classList.add('show');
-            setTimeout(() => { bodyEl.style.transition = 'opacity .45s'; bodyEl.style.opacity = '1'; }, 240);
-        }
-
-        function closeOverlay() {
-            const card = document.getElementById('wishCard');
-            card.style.transition = 'transform .4s ease,opacity .32s ease';
-            card.style.transform = 'translateY(60px) scale(.86) rotateX(6deg)';
-            card.style.opacity = '0';
             setTimeout(() => {
-                overlay.classList.remove('show');
-                card.style.cssText = '';
-            }, 420);
+                burst();
+                bodyEl.textContent = wish;
+                overlay.classList.add('show');
+                const tts = new SpeechSynthesisUtterance(wish);
+                tts.lang = 'vi-VN';
+                window.speechSynthesis.speak(tts);
+            }, 700);
         }
 
-        // Update tap hint before first open
-        (function updateHint() {
-            if (openCount >= MAX_OPEN) return;
-            const rem = MAX_OPEN - openCount;
-            tapHint.innerHTML = `<span class="bounce">💌</span>&nbsp; Bấm để mở thư! &nbsp;<span style="background:rgba(249,168,212,.25);border-radius:30px;padding:.15rem .6rem;font-size:.88em;">${rem} lần còn lại</span>`;
-        })();
-
-        scene.addEventListener('click', () => {
-            if (openCount >= MAX_OPEN) { return; }
-            openEnvelope();
+        aiBtn.addEventListener('click', async () => {
+            await loadModels();
+            await startCamera();
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance("")); // Unlock audio
         });
-        scene.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openEnvelope(); });
+        scene.addEventListener('click', () => openLetter(WISHES[Math.floor(Math.random() * WISHES.length)]));
         document.getElementById('btnClose').addEventListener('click', () => {
-            closeOverlay();
-            // After closing, if still have opens remaining, re-enable envelope
-            if (openCount < MAX_OPEN) {
-                setTimeout(() => {
-                    opened = false;
-                    scene.classList.remove('opened');
-                    const rem2 = MAX_OPEN - openCount;
-                    tapHint.innerHTML = `<span class="bounce">💌</span>&nbsp; Bấm để mở thư! &nbsp;<span style="background:rgba(249,168,212,.25);border-radius:30px;padding:.15rem .6rem;font-size:.88em;">${rem2} lần còn lại</span>`;
-                    tapHint.style.cssText = '';
-                }, 450);
-            } else {
-                // Used all 5 — show locked screen after short delay
-                setTimeout(() => {
-                    overlay.classList.remove('show');
-                    document.getElementById('alreadyWishEl').textContent = localStorage.getItem(LS_KEY);
-                    document.getElementById('alreadyScreen').classList.add('show');
-                    document.getElementById('envWrap').style.display = 'none';
-                }, 500);
-            }
-        });
-        overlay.querySelector('.wish-backdrop').addEventListener('click', () => {
-            closeOverlay();
-            if (openCount < MAX_OPEN) {
-                setTimeout(() => {
-                    opened = false;
-                    scene.classList.remove('opened');
-                    const rem2 = MAX_OPEN - openCount;
-                    tapHint.innerHTML = `<span class="bounce">💌</span>&nbsp; Bấm để mở thư! &nbsp;<span style="background:rgba(249,168,212,.25);border-radius:30px;padding:.15rem .6rem;font-size:.88em;">${rem2} lần còn lại</span>`;
-                    tapHint.style.cssText = '';
-                }, 450);
-            } else {
-                setTimeout(() => {
-                    overlay.classList.remove('show');
-                    document.getElementById('alreadyWishEl').textContent = localStorage.getItem(LS_KEY);
-                    document.getElementById('alreadyScreen').classList.add('show');
-                    document.getElementById('envWrap').style.display = 'none';
-                }, 500);
-            }
+            overlay.classList.remove('show');
+            setTimeout(() => { opened = false; scene.classList.remove('opened'); if (!aiBtn.style.display) startCamera(); else detect(); }, 500);
         });
 
-        /* ── PARTICLES ── */
+        /* Particles */
         const cv = document.getElementById('bg'), cx = cv.getContext('2d');
         let W, H, parts = [];
         function resize() { W = cv.width = innerWidth; H = cv.height = innerHeight; }
         resize(); addEventListener('resize', resize);
-
-        const AMB = ['🌸', '🌷', '🌺', '💮', '✨', '💕', '💖', '🌸', '🌸', '🌷', '⭐'];
-        const BURST = ['💖', '💕', '💗', '💝', '🌸', '✨', '🎀', '🎊', '🌷', '⭐'];
-
         class P {
             constructor(b = false) {
-                this.b = b;
-                if (b) {
-                    this.x = W / 2 + (Math.random() - .5) * 120; this.y = H * .48;
-                    this.vx = (Math.random() - .5) * 9; this.vy = -(Math.random() * 10 + 4);
-                    this.life = Math.random() * 110 + 75;
-                } else {
-                    this.x = Math.random() * W; this.y = -35;
-                    this.vx = (Math.random() - .5) * .95; this.vy = Math.random() * 1.2 + .3;
-                    this.life = Infinity;
-                }
-                this.c = b ? BURST[Math.floor(Math.random() * BURST.length)] : AMB[Math.floor(Math.random() * AMB.length)];
-                this.sz = Math.random() * 14 + 10; this.rot = Math.random() * 6.28;
-                this.rv = (Math.random() - .5) * .065; this.a = 1; this.age = 0;
+                this.b = b; this.x = b ? W / 2 : Math.random() * W; this.y = b ? H * 0.5 : -20;
+                this.vx = (Math.random() - 0.5) * (b ? 10 : 1); this.vy = b ? -(Math.random() * 10 + 5) : Math.random() * 2 + 1;
+                this.c = ['🌸', '✨', '💕', '🌷'][Math.floor(Math.random() * 4)]; this.sz = Math.random() * 15 + 10;
+                this.age = 0; this.life = b ? 100 : Infinity;
             }
             tick() {
-                this.x += this.vx; this.y += this.vy; this.rot += this.rv; this.age++;
-                if (this.b) { this.vy += .09; this.a = Math.max(0, 1 - this.age / this.life); }
-                if (!this.b && this.y > H + 30) { this.x = Math.random() * W; this.y = -30; }
-                return this.b && this.age >= this.life;
+                this.x += this.vx; this.y += this.vy; this.age++;
+                if (this.b) this.vy += 0.2;
+                if (!this.b && this.y > H) this.y = -20;
+                return this.b && this.age > this.life;
             }
-            draw() {
-                cx.save(); cx.globalAlpha = this.a;
-                cx.translate(this.x, this.y); cx.rotate(this.rot);
-                cx.font = this.sz + 'px serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
-                cx.fillText(this.c, 0, 0); cx.restore();
-            }
+            draw() { cx.font = this.sz + 'px serif'; cx.fillText(this.c, this.x, this.y); }
         }
-
-        function burst() { for (let i = 0; i < 50; i++)parts.push(new P(true)); }
-        (function init() { const n = Math.max(20, Math.floor(W / 36)); for (let i = 0; i < n; i++) { const p = new P(); p.y = Math.random() * H; parts.push(p); } })();
-        (function loop() { cx.clearRect(0, 0, W, H); parts = parts.filter(p => { const d = p.tick(); p.draw(); return !d; }); requestAnimationFrame(loop); })();
+        function burst() { for (let i = 0; i < 30; i++) parts.push(new P(true)); }
+        for (let i = 0; i < 30; i++) parts.push(new P());
+        (function loop() { cx.clearRect(0, 0, W, H); parts = parts.filter(p => !p.tick()); parts.forEach(p => p.draw()); requestAnimationFrame(loop); })();
     </script>
 </body>
 
