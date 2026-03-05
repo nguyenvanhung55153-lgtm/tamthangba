@@ -549,39 +549,46 @@
 
         document.body.addEventListener('click', () => { if (video.paused) video.play(); }, { once: true });
 
-        // Step 3: Multi-AI Tracking Loop (Parallelized)
+        // Step 3: High-Performance Multi-AI Tracking Loop
         let faceDetectCount = 0;
-        async function aiLoop() {
+        let lastTimestamp = 0;
+        let frameCount = 0;
+        let isAiWorkinging = false;
+
+        async function aiLoop(timestamp) {
             if (opened || processing) return;
             if (video.readyState < 2) { requestAnimationFrame(aiLoop); return; }
 
-            // Kick off hand detection (background)
-            hands.send({ image: video }).catch(() => { });
+            frameCount++;
+            // Optimization: Only run AI every 3 frames (~20 times per second) 
+            // to keep the UI smooth at 60fps
+            if (frameCount % 3 === 0 && !isAiWorkinging) {
+                isAiWorkinging = true;
 
-            // Face Detection (inputSize 128 for lightning speed)
-            try {
-                const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({
-                    inputSize: 128,
-                    scoreThreshold: 0.38
-                }))
-                    .withFaceLandmarks()
-                    .withFaceDescriptor();
+                // Run Hand & Face in parallel but don't block the next frame
+                (async () => {
+                    try {
+                        // Parallel hand & face
+                        const handTask = hands.send({ image: video });
+                        const faceTask = faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({
+                            inputSize: 128,
+                            scoreThreshold: 0.4
+                        })).withFaceLandmarks().withFaceDescriptor();
 
-                if (det) {
-                    faceDetectCount++;
-                    if (faceDetectCount >= 1) { // 1 frame is enough now since threshold is higher
-                        processing = true;
-                        statusSpan.textContent = "✨ Thấy mặt bạn rồi! Mở thư...";
-                        handleMatch(det.descriptor);
-                        faceDetectCount = 0;
-                        return; // Exit loop early on success
+                        const [_, det] = await Promise.all([handTask, faceTask]);
+
+                        if (det && !opened && !processing) {
+                            processing = true;
+                            statusSpan.textContent = "✨ Thấy mặt bạn rồi! Mở thư...";
+                            handleMatch(det.descriptor);
+                        }
+                    } catch (e) { } finally {
+                        isAiWorkinging = false;
                     }
-                } else {
-                    faceDetectCount = 0;
-                }
-            } catch (e) { }
+                })();
+            }
 
-            if (!opened && !processing) requestAnimationFrame(aiLoop);
+            requestAnimationFrame(aiLoop);
         }
 
         function handleMatch(descriptor) {
