@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#fde8f5" />
-    <title>Chúc Mừng 8/3 – Lớp 11A5 💖 AI Vision</title>
-    <meta name="description" content="Website chúc mừng 8/3 tích hợp AI nhận diện khuôn mặt." />
+    <title>Chúc Mừng 8/3 – Lớp 11A5 💖 AI Automatic</title>
+    <meta name="description" content="Website chúc mừng 8/3 tích hợp AI tự động nhận diện khuôn mặt." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -68,54 +68,14 @@
             backdrop-filter: blur(12px);
             padding: 10px 22px;
             border-radius: 30px;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: #be185d;
-            box-shadow: 0 8px 32px rgba(190, 24, 93, 0.15);
+            box-shadow: 0 8px 32px rgba(190, 24, 93, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            display: none;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.4s ease;
             text-align: center;
             font-weight: 600;
-        }
-
-        #aiBtn {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            background: linear-gradient(135deg, #f472b6, #7c3aed);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 50px;
-            font-weight: 800;
-            font-family: 'Baloo 2', cursive;
-            font-size: 1.1rem;
-            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
-            cursor: pointer;
-            transition: all 0.3s;
-            animation: pulseBtn 2s infinite;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        #aiBtn:active {
-            transform: translateX(-50%) scale(0.95);
-        }
-
-        @keyframes pulseBtn {
-            0% {
-                box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.7);
-            }
-
-            70% {
-                box-shadow: 0 0 0 15px rgba(244, 114, 182, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(244, 114, 182, 0);
-            }
+            pointer-events: none;
         }
 
         video#video {
@@ -405,7 +365,6 @@
     <canvas id="bg"></canvas>
     <video id="video" autoplay muted playsinline></video>
     <div id="aiStatus">Đang khởi động AI...</div>
-    <button id="aiBtn">✨ Bật AI Nhận Diện & Mở Thư ✨</button>
 
     <div id="envWrap">
         <p class="env-label">🌸 Lớp 11A5 · Chúc Mừng 8/3 🌸</p>
@@ -432,7 +391,7 @@
                 </div>
             </div>
         </div>
-        <p class="tap-hint"><span class="bounce">💌</span> Mỉm cười để mở thư nhé!</p>
+        <p class="tap-hint"><span class="bounce">💌</span> Hãy mỉm cười để mở thư nhé!</p>
     </div>
 
     <div class="wish-overlay" id="wishOverlay">
@@ -503,44 +462,68 @@
 
         const LS_KEY = 'face_wish_map_11a5';
         let faceWishes = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-        let modelsLoaded = false, opened = false;
+        let modelsLoaded = false, opened = false, audioUnlocked = false;
         const video = document.getElementById('video'), aiStatus = document.getElementById('aiStatus');
-        const aiBtn = document.getElementById('aiBtn'), overlay = document.getElementById('wishOverlay');
+        const overlay = document.getElementById('wishOverlay');
         const bodyEl = document.getElementById('wishBodyEl'), scene = document.getElementById('envScene');
+
+        // Automatic initialization
+        window.addEventListener('load', async () => {
+            await loadModels();
+            await startCamera();
+        });
+
+        // Audio Unlocker: Browser needs a user gesture to play voice
+        document.body.addEventListener('click', () => {
+            if (!audioUnlocked) {
+                const dummy = new SpeechSynthesisUtterance("");
+                window.speechSynthesis.speak(dummy);
+                audioUnlocked = true;
+            }
+        }, { once: false });
 
         async function loadModels() {
             aiStatus.style.display = 'block';
-            aiStatus.textContent = "⌛ Đang nạp bộ não AI (vui lòng đợi)...";
+            aiStatus.textContent = "⌛ Đang nạp bộ não AI...";
             const URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
-            await Promise.all([
-                faceapi.nets.tinyFaceDetector.loadFromUri(URL),
-                faceapi.nets.faceLandmark68Net.loadFromUri(URL),
-                faceapi.nets.faceRecognitionNet.loadFromUri(URL),
-                faceapi.nets.faceExpressionNet.loadFromUri(URL)
-            ]);
-            modelsLoaded = true;
-            aiStatus.textContent = "✅ AI đã sẵn sàng!";
-            setTimeout(() => aiStatus.style.opacity = '0', 2000);
+            try {
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(URL),
+                    faceapi.nets.faceExpressionNet.loadFromUri(URL)
+                ]);
+                modelsLoaded = true;
+                aiStatus.textContent = "✅ AI đã sẵn sàng!";
+                setTimeout(() => aiStatus.style.opacity = '0', 3000);
+            } catch (e) { aiStatus.textContent = "❌ Lỗi khởi động AI."; }
         }
 
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
                 video.srcObject = stream;
-                aiBtn.style.display = 'none';
                 aiStatus.style.opacity = '1';
-                aiStatus.textContent = "🔍 Đang tìm khuôn mặt...";
+                aiStatus.textContent = "🔍 Đang tìm nụ cười...";
                 detect();
-            } catch (err) { alert("Hãy cấp quyền Camera để AI có thể nhìn thấy nụ cười của bạn nhé!"); }
+            } catch (err) {
+                aiStatus.textContent = "⚠️ Cần quyền Camera!";
+                console.error(err);
+            }
         }
 
         async function detect() {
             if (opened) return;
-            const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions().withFaceDescriptor();
-            if (det) {
-                aiStatus.textContent = "🌸 Thấy bạn rồi! Mỉm cười để mở nhé...";
-                if (det.expressions.happy > 0.8) handleOpen(det.descriptor);
-            } else { aiStatus.textContent = "🔍 Đang tìm khuôn mặt..."; }
+            try {
+                const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions().withFaceDescriptor();
+                if (det) {
+                    aiStatus.style.opacity = '1';
+                    aiStatus.textContent = "🌸 Thấy bạn rồi! Mỉm cười để mở nhé...";
+                    if (det.expressions.happy > 0.8) handleOpen(det.descriptor);
+                } else {
+                    // Slow fade out status if no face
+                }
+            } catch (e) { }
             if (!opened) requestAnimationFrame(detect);
         }
 
@@ -561,27 +544,30 @@
         }
 
         function openLetter(wish) {
+            if (opened) return;
             opened = true;
             scene.classList.add('opened');
+            aiStatus.style.opacity = '0';
             setTimeout(() => {
                 burst();
                 bodyEl.textContent = wish;
                 overlay.classList.add('show');
+
+                // Voice (Requires at least one tap on page before)
                 const tts = new SpeechSynthesisUtterance(wish);
                 tts.lang = 'vi-VN';
                 window.speechSynthesis.speak(tts);
             }, 700);
         }
 
-        aiBtn.addEventListener('click', async () => {
-            await loadModels();
-            await startCamera();
-            window.speechSynthesis.speak(new SpeechSynthesisUtterance("")); // Unlock audio
-        });
         scene.addEventListener('click', () => openLetter(WISHES[Math.floor(Math.random() * WISHES.length)]));
         document.getElementById('btnClose').addEventListener('click', () => {
             overlay.classList.remove('show');
-            setTimeout(() => { opened = false; scene.classList.remove('opened'); if (!aiBtn.style.display) startCamera(); else detect(); }, 500);
+            setTimeout(() => {
+                opened = false;
+                scene.classList.remove('opened');
+                detect();
+            }, 500);
         });
 
         /* Particles */
@@ -592,20 +578,20 @@
         class P {
             constructor(b = false) {
                 this.b = b; this.x = b ? W / 2 : Math.random() * W; this.y = b ? H * 0.5 : -20;
-                this.vx = (Math.random() - 0.5) * (b ? 10 : 1); this.vy = b ? -(Math.random() * 10 + 5) : Math.random() * 2 + 1;
-                this.c = ['🌸', '✨', '💕', '🌷'][Math.floor(Math.random() * 4)]; this.sz = Math.random() * 15 + 10;
+                this.vx = (Math.random() - 0.5) * (b ? 12 : 1.5); this.vy = b ? -(Math.random() * 12 + 6) : Math.random() * 2 + 1;
+                this.c = ['🌸', '✨', '💕', '🌷', '🎀', '💖'][Math.floor(Math.random() * 6)]; this.sz = Math.random() * 16 + 12;
                 this.age = 0; this.life = b ? 100 : Infinity;
             }
             tick() {
                 this.x += this.vx; this.y += this.vy; this.age++;
-                if (this.b) this.vy += 0.2;
+                if (this.b) this.vy += 0.25;
                 if (!this.b && this.y > H) this.y = -20;
                 return this.b && this.age > this.life;
             }
             draw() { cx.font = this.sz + 'px serif'; cx.fillText(this.c, this.x, this.y); }
         }
-        function burst() { for (let i = 0; i < 30; i++) parts.push(new P(true)); }
-        for (let i = 0; i < 30; i++) parts.push(new P());
+        function burst() { for (let i = 0; i < 40; i++) parts.push(new P(true)); }
+        for (let i = 0; i < 35; i++) parts.push(new P());
         (function loop() { cx.clearRect(0, 0, W, H); parts = parts.filter(p => !p.tick()); parts.forEach(p => p.draw()); requestAnimationFrame(loop); })();
     </script>
 </body>
