@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#fde8f5" />
-    <title>8/3 AI – 11A5 💖 Super Vision</title>
+    <title>8/3 AI – 11A5 💖 Vision & Hands</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -93,7 +93,6 @@
             }
         }
 
-        /* Positioning video to be tiny but active for system processing */
         video#video {
             position: fixed;
             bottom: 0;
@@ -388,9 +387,9 @@
     <canvas id="bg"></canvas>
     <video id="video" autoplay muted playsinline></video>
     <div id="aiStatus">
-        <div class="ai-pulse"></div><span>Đang khởi động AI...</span>
+        <div class="ai-pulse"></div><span>Đang khởi động Hệ thống AI đa nhiệm...</span>
     </div>
-    <div id="debugHint">Cần đủ ánh sáng và nhìn thẳng vào cam nhé!</div>
+    <div id="debugHint">Nhìn thẳng hoặc giơ tay trước cam nhé!</div>
 
     <div id="envWrap">
         <p class="env-label">🌸 11A5 Chúc Mừng 8/3 🌸</p>
@@ -417,7 +416,7 @@
                 </div>
             </div>
         </div>
-        <p class="tap-hint">💌 Nhìn vào camera để mở thư</p>
+        <p class="tap-hint">💌 Nhìn camera HOẶC giơ tay để mở</p>
     </div>
 
     <div class="wish-overlay" id="wishOverlay">
@@ -431,7 +430,10 @@
         </div>
     </div>
 
+    <!-- AI LIBRARIES -->
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+
     <script>
         const WISHES = [
             "Chúc bạn 8/3 rạng rỡ như đóa hoa hướng dương, luôn hướng về phía mặt trời và tràn đầy năng lượng! 🌻",
@@ -491,27 +493,39 @@
         let opened = false, processing = false;
         const video = document.getElementById('video'), aiStatus = document.getElementById('aiStatus'), statusSpan = aiStatus.querySelector('span');
 
-        // Step 1: Initialize
+        // Step 1: Hand Detection Setup (MediaPipe)
+        const hands = new Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+        hands.onResults((results) => {
+            if (opened || processing) return;
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                processing = true;
+                statusSpan.textContent = "🖐️ Đã thấy tay! Mở thư ngay...";
+                handleMatch(null);
+            }
+        });
+
+        // Step 2: Initialize
         window.addEventListener('load', async () => {
             statusSpan.textContent = "⏳ Đang chuẩn bị AI...";
             await loadAI();
             startCamera();
         });
 
-        // Step 2: Load Models
         async function loadAI() {
-            const URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+            const F_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
             try {
                 await Promise.all([
-                    faceapi.nets.tinyFaceDetector.loadFromUri(URL),
-                    faceapi.nets.faceLandmark68Net.loadFromUri(URL),
-                    faceapi.nets.faceRecognitionNet.loadFromUri(URL)
+                    faceapi.nets.tinyFaceDetector.loadFromUri(F_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(F_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(F_URL)
                 ]);
-                statusSpan.textContent = "✅ AI đã sẵn sàng!";
-            } catch (e) { statusSpan.textContent = "⚠️ Lỗi nạp AI."; }
+                statusSpan.textContent = "✅ Hệ thống AI sẵn sàng!";
+            } catch (e) { statusSpan.textContent = "⚠️ Lỗi AI."; }
         }
 
-        // Step 3: Start Camera with iOS fixes
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -520,58 +534,55 @@
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     video.play();
-                    statusSpan.textContent = "🔍 Đang rà soát khuôn mặt...";
-                    detectLoop();
+                    statusSpan.textContent = "🔍 Đang rà soát...";
+                    aiLoop();
                 };
             } catch (err) {
                 statusSpan.textContent = "⚠️ Cần cấp quyền Camera!";
             }
         }
 
-        // Backup startup for iOS
         document.body.addEventListener('click', () => { if (video.paused) video.play(); }, { once: true });
 
-        // Step 4: Robust Detection Loop
-        async function detectLoop() {
+        // Step 3: Multi-AI Tracking Loop
+        async function aiLoop() {
             if (opened || processing) return;
+            if (video.readyState < 2) { requestAnimationFrame(aiLoop); return; }
 
-            // Check if video is actually giving frames
-            if (video.readyState < 2) {
-                requestAnimationFrame(detectLoop);
-                return;
-            }
+            // Hand Check (Fast)
+            try { await hands.send({ image: video }); } catch (e) { }
 
+            // Face Check (Optimized 160px)
             try {
-                // Larger input size (320) + Very low threshold (0.1) = Super Aggressive
-                const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.1 }))
-                    .withFaceLandmarks()
-                    .withFaceDescriptor();
+                const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.15 }))
+                    .withFaceLandmarks().withFaceDescriptor();
 
                 if (det) {
                     processing = true;
-                    statusSpan.textContent = "✨ Đã nhận diện! Mở thư...";
+                    statusSpan.textContent = "✨ Thấy mặt rồi! Mở thư...";
                     handleMatch(det.descriptor);
                 }
-            } catch (e) { /* ignore errors in loop */ }
+            } catch (e) { }
 
-            if (!opened && !processing) requestAnimationFrame(detectLoop);
+            if (!opened && !processing) requestAnimationFrame(aiLoop);
         }
 
         function handleMatch(descriptor) {
-            const currentDesc = Array.from(descriptor);
             let wishIdx = -1;
-
-            // Flexible matching (0.7 distance) to account for glasses, hair, lighting
-            for (const id in faceWishes) {
-                const stored = faceWishes[id].descriptor;
-                const dist = Math.sqrt(currentDesc.reduce((sum, val, i) => sum + Math.pow(val - stored[i], 2), 0));
-                if (dist < 0.7) { wishIdx = faceWishes[id].idx; break; }
-            }
-
-            if (wishIdx === -1) {
+            if (descriptor) {
+                const currentDesc = Array.from(descriptor);
+                for (const id in faceWishes) {
+                    const stored = faceWishes[id].descriptor;
+                    const dist = Math.sqrt(currentDesc.reduce((sum, val, i) => sum + Math.pow(val - stored[i], 2), 0));
+                    if (dist < 0.7) { wishIdx = faceWishes[id].idx; break; }
+                }
+                if (wishIdx === -1) {
+                    wishIdx = Math.floor(Math.random() * WISHES.length);
+                    faceWishes[Date.now()] = { descriptor: currentDesc, idx: wishIdx };
+                    localStorage.setItem(LS_KEY, JSON.stringify(faceWishes));
+                }
+            } else {
                 wishIdx = Math.floor(Math.random() * WISHES.length);
-                faceWishes[Date.now()] = { descriptor: currentDesc, idx: wishIdx };
-                localStorage.setItem(LS_KEY, JSON.stringify(faceWishes));
             }
             showWish(WISHES[wishIdx]);
         }
@@ -587,19 +598,17 @@
             }, 700);
         }
 
-        // Close logic
         document.getElementById('btnClose').addEventListener('click', () => {
             document.getElementById('wishOverlay').classList.remove('show');
             setTimeout(() => {
                 opened = false; processing = false;
                 document.getElementById('envScene').classList.remove('opened');
                 aiStatus.style.opacity = '1';
-                statusSpan.textContent = "🔍 Đang đợi người tiếp theo...";
-                detectLoop();
+                statusSpan.textContent = "🔍 Đang rà soát...";
+                aiLoop();
             }, 500);
         });
 
-        // Manual backup
         document.getElementById('envScene').addEventListener('click', () => {
             if (!opened) showWish(WISHES[Math.floor(Math.random() * WISHES.length)]);
         });
