@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#fde8f5" />
-    <title>8/3 AI – 11A5 💖 Super Sensitive Vision</title>
-    <meta name="description" content="Website chúc mừng 8/3 với AI nhận diện cực nhanh." />
+    <title>8/3 AI – 11A5 💖 Silent Vision</title>
+    <meta name="description" content="Website chúc mừng 8/3 với AI nhận diện cực nhanh, không âm thanh." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -430,7 +430,6 @@
         </div>
     </div>
 
-    <!-- Optimization: Use higher accuracy models but stick with Tiny for speed -->
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script>
         const WISHES = [
@@ -476,7 +475,7 @@
             "Chúc bạn luôn là tâm điểm của mọi sự chú ý nhờ tài năng và sự thông minh của mình. 🧠",
             "Hy vọng trái tim bạn sẽ luôn ấm áp và tràn đầy yêu thương dành cho mọi người. ❤️",
             "Chúc bạn có một ngày 8/3 thật 'fancy' và sành điệu theo cách mà bạn muốn! 👠",
-            "Mong cho những điều ước của bạn trong ngày hôm nay đều trở thành hiện thực! 🌠",
+            "Mong cho những điều ước của bạn trong ngày hôm nay đều trở thành thực! 🌠",
             "Gửi lời chúc mừng đến cô gái thông minh nhất lớp! Chúc bạn 8/3 thành công vang dội. 🎓",
             "Chúc bạn luôn là một 'ngôi sao' tỏa sáng theo cách riêng, không cần phải giống bất kỳ ai. ⭐",
             "Mong bạn luôn nhận được sự quan tâm chu đáo từ những người thân yêu nhất xung quanh mình. 🍬",
@@ -488,7 +487,7 @@
 
         const LS_KEY = 'face_wish_map_11a5';
         let faceWishes = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-        let modelsLoaded = false, opened = false, audioUnlocked = false;
+        let modelsLoaded = false, opened = false;
         const video = document.getElementById('video'), aiStatus = document.getElementById('aiStatus');
         const overlay = document.getElementById('wishOverlay');
         const bodyEl = document.getElementById('wishBodyEl'), scene = document.getElementById('envScene');
@@ -499,21 +498,11 @@
             await startCamera();
         });
 
-        // Audio Unlocker
-        document.body.addEventListener('click', () => {
-            if (!audioUnlocked) {
-                const dummy = new SpeechSynthesisUtterance("");
-                window.speechSynthesis.speak(dummy);
-                audioUnlocked = true;
-            }
-        }, { once: false });
-
         async function loadModels() {
             aiStatus.style.display = 'flex';
-            aiStatus.querySelector('span').textContent = "☕ AI đang học cách nhận diện bạn...";
+            aiStatus.querySelector('span').textContent = "☕ Đang nạp AI nhận diện...";
             const URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
             try {
-                // Using SSD for higher accuracy as requested (99% goal)
                 await Promise.all([
                     faceapi.nets.tinyFaceDetector.loadFromUri(URL),
                     faceapi.nets.faceLandmark68Net.loadFromUri(URL),
@@ -521,7 +510,7 @@
                     faceapi.nets.faceExpressionNet.loadFromUri(URL)
                 ]);
                 modelsLoaded = true;
-                aiStatus.querySelector('span').textContent = "✨ Phép màu AI đã sẵn sàng!";
+                aiStatus.querySelector('span').textContent = "✨ AI đã sẵn sàng!";
                 setTimeout(() => aiStatus.style.opacity = '0.4', 2000);
             } catch (e) { aiStatus.querySelector('span').textContent = "⚠️ Lỗi kết nối AI."; }
         }
@@ -544,18 +533,16 @@
         async function detect() {
             if (opened) return;
             try {
-                // Optimization: lower threshold for immediate recognition
+                // High sensitivity: lower threshold 0.3 for instant catch
                 const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 }))
                     .withFaceExpressions()
                     .withFaceDescriptor();
 
                 if (det) {
                     facePresentFrames++;
-                    aiStatus.style.opacity = '1';
-                    aiStatus.querySelector('span').textContent = "🌸 Đã thấy bạn! Đang mở thư...";
-
-                    // "Bất cứ ai nhìn thấy mặt thì nhận luôn" -> Just needs 2 frames of face detection
                     if (facePresentFrames > 2) {
+                        aiStatus.style.opacity = '1';
+                        aiStatus.querySelector('span').textContent = "🌸 Đã thấy bạn! Đang mở thư...";
                         handleOpen(det.descriptor);
                     }
                 } else {
@@ -570,7 +557,6 @@
             const currentDesc = Array.from(descriptor);
             let wishIdx = -1;
 
-            // Euclidean distance with 0.6 threshold for better matching
             for (const id in faceWishes) {
                 const dist = Math.sqrt(currentDesc.map((v, i) => Math.pow(v - faceWishes[id].descriptor[i], 2)).reduce((a, b) => a + b));
                 if (dist < 0.6) { wishIdx = faceWishes[id].idx; break; }
@@ -593,16 +579,14 @@
                 burst();
                 bodyEl.textContent = wish;
                 overlay.classList.add('show');
-
-                // Voice reading
-                const tts = new SpeechSynthesisUtterance(wish);
-                tts.lang = 'vi-VN';
-                tts.rate = 0.9;
-                window.speechSynthesis.speak(tts);
+                // TTS removed as requested
             }, 700);
         }
 
-        scene.addEventListener('click', () => openLetter(WISHES[Math.floor(Math.random() * WISHES.length)]));
+        scene.addEventListener('click', () => {
+            if (!opened) openLetter(WISHES[Math.floor(Math.random() * WISHES.length)]);
+        });
+
         document.getElementById('btnClose').addEventListener('click', () => {
             overlay.classList.remove('show');
             setTimeout(() => {
